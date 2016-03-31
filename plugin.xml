@@ -16,6 +16,10 @@
         
     <!-- android -->
     <platform name="android">
+    
+        
+        <framework src="build-gradle.extras" custom="true" type="gradleReference" />
+        
         <source-file src="src/main/java/com/amchealth/callback/Callback.java" target-dir="src/com/amchealth/callback/" /> 
         <source-file src="src/main/java/com/amchealth/callback/Event.java" target-dir="src/com/amchealth/callback/" /> 
         <source-file src="src/main/java/com/amchealth/callback/EventEmitter.java" target-dir="src/com/amchealth/callback/" /> 
