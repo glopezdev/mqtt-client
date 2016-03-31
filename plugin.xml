@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+ 
+<plugin xmlns="http://www.phonegap.com/ns/plugins/1.0"
+           id="com.amchealth.mqtt-client-api"
+      version="0.0.1">
+    <name>Mqtt Client</name>
+    <description>Handles messages to and from other service to communicate with a conversation engine</description>
+    <license>MIT</license>
+
+    <engines>
+        <engine name="cordova" version=">=3.0.0" />
+    </engines> 
+    
+    <!-- ios -->
+    <!-- TBD -->
+        
+    <!-- android -->
+    <platform name="android">
+        <source-file src="src/main/java/com/amchealth/callback/Callback.java" target-dir="src/com/amchealth/callback/" /> 
+        <source-file src="src/main/java/com/amchealth/callback/Event.java" target-dir="src/com/amchealth/callback/" /> 
+        <source-file src="src/main/java/com/amchealth/callback/EventEmitter.java" target-dir="src/com/amchealth/callback/" /> 
+        <source-file src="src/main/java/com/amchealth/conversation/Agent.java" target-dir="src/com/amchealth/conversation/" /> 
+        <source-file src="src/main/java/com/amchealth/mqtt_client_api/Socket.java" target-dir="src/com/amchealth/mqtt_client_api/" />
+        <source-file src="src/main/java/com/amchealth/mqtt_client_api/MqttWrapper.java" target-dir="src/com/amchealth/mqtt_client_api/" />
+        <source-file src="src/main/java/com/amchealth/mqtt_client_api/AuthFunction.java" target-dir="src/com/amchealth/mqtt_client_api/" />   
+    </platform>          
+</plugin>
