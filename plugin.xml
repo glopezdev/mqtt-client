@@ -27,10 +27,6 @@
         <source-file src="src/main/java/com/amchealth/mqtt_client_api/Socket.java" target-dir="src/com/amchealth/mqtt_client_api/" />
         <source-file src="src/main/java/com/amchealth/mqtt_client_api/MqttWrapper.java" target-dir="src/com/amchealth/mqtt_client_api/" />
         <source-file src="src/main/java/com/amchealth/mqtt_client_api/AuthFunction.java" target-dir="src/com/amchealth/mqtt_client_api/" /> 
-        <source-file src="src/main/java/io/inventit/dev/mqtt/paho/MqttWebSocketAsyncClient.java" target-dir="src/io/inventit/dev/mqtt/paho/" />   
-        <source-file src="src/main/java/io/inventit/dev/mqtt/paho/PahoConsoleLogger.java" target-dir="src/io/inventit/dev/mqtt/paho/" />
-        <source-file src="src/main/java/io/inventit/dev/mqtt/paho/WebSocketNetworkModule.java" target-dir="src/io/inventit/dev/mqtt/paho/" />   
-
 
     </platform>          
 </plugin>
