@@ -1,3 +1,4 @@
 dependencies {
     compile group: 'org.eclipse.paho', name: 'org.eclipse.paho.client.mqttv3', version: '1.0.2'
+    compile group: 'org.eclipse.jetty.websocket', name:'websocket-client', version:'9.2.14.v20151106'
 }
