@@ -88,8 +88,8 @@ public class AgentTest {
       }
     });
     socket.connect();
-    socket.subscribe("test.obj:state:running:"+agentId);
-    socket.subscribe("test.obj:state:null:"+agentId);
+    //socket.subscribe("test.obj:state:running:"+agentId);
+    //socket.subscribe("test.obj:state:null:"+agentId);
     try {
       signal.await(2, TimeUnit.SECONDS);// wait for connect
       Assert.assertEquals("should have gotten to running",0, signal.getCount());
