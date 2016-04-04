@@ -82,19 +82,18 @@ public class Agent {
 
 	public void emit(String event, JSONObject eventData,
 			Callback<String, String> cb) {
-		JSONObject msg = new JSONObject();
+		//JSONObject msg = new JSONObject();
 		String fullEvent = agent + "::" + event;
-		jsonPut(msg, "event", fullEvent);
+		//jsonPut(msg, "event", fullEvent);
 
 		JSONObject data = new JSONObject();
-		jsonPut(msg, "data", data);
+		//jsonPut(msg, "data", data);
 
 		jsonPut(data, "agentData", agentData);
 		if (eventData != null) {
 			jsonPut(data, "data", eventData);
 		}
-
-		socket.publish(fullEvent, msg.toString());
+		socket.publish(fullEvent, data.toString());
 	}
 
 	public Callback<String, String> on(String event, final Event<JSONObject> cb) {

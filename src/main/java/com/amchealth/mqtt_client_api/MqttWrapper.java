@@ -97,6 +97,8 @@ public class MqttWrapper {
 			reconnect(emitter, options);
 		} catch (MqttException e) {
 			if(e.getReasonCode()!=32100)//already connected
+				//reason 6 connection refuse
+				//TODO dont crash the app when server unrecheable
 				throw new RuntimeException(e);
 		}
 	}

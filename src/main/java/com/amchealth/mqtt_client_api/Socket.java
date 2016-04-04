@@ -56,8 +56,10 @@ public class Socket {
 	}
 
 	public void disconnect() {
-		socketClient.disconnect(emitter);
-		socketClient = null;
+		if (socketClient!=null){
+			socketClient.disconnect(emitter);
+			socketClient = null;
+		}
 	}
 
 	public void subscribe(String topic) {
