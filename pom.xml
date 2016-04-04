@@ -13,14 +13,98 @@
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 	</properties>
+	<build>
+
+		<plugins>
+            <plugin>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>3.0</version>
+                <configuration>
+                    <source>1.7</source>
+                    <target>1.7</target>
+                </configuration>
+            </plugin>
+			<plugin>
+				<groupId>com.googlecode.maven-download-plugin</groupId>
+				<artifactId>download-maven-plugin</artifactId>
+				<version>1.2.1</version>
+				<executions>
+					<execution>
+						<id>download-mqtt-websocket</id>
+						<phase>process-resources</phase>
+						<goals>
+							<goal>wget</goal>
+						</goals>
+						<configuration>
+							<url>https://github.com/inventit/mqtt-websocket-java/archive/1.0.1.zip</url>
+							<unpack>true</unpack>
+							<outputDirectory>${project.build.directory}/ext-src/mqtt-websocket</outputDirectory>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>build-helper-maven-plugin</artifactId>
+				<version>1.7</version>
+				<executions>
+					<execution>
+						<id>add-mqtt-socket-source</id>
+						<phase>process-resources</phase>
+						<goals>
+							<goal>add-source</goal>
+						</goals>
+						<configuration>
+							<sources>
+                                <source>src/main/java</source>
+                                <source>${project.build.directory}/ext-src/mqtt-websocket/mqtt-websocket-java-1.0.1/src/main/java</source>
+                              </sources>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+		</plugins>
+		<pluginManagement>
+			<plugins>
+				<!--This plugin's configuration is used to store Eclipse m2e settings 
+					only. It has no influence on the Maven build itself. -->
+				<plugin>
+					<groupId>org.eclipse.m2e</groupId>
+					<artifactId>lifecycle-mapping</artifactId>
+					<version>1.0.0</version>
+					<configuration>
+						<lifecycleMappingMetadata>
+							<pluginExecutions>
+								<pluginExecution>
+									<pluginExecutionFilter>
+										<groupId>
+											com.googlecode.maven-download-plugin
+										</groupId>
+										<artifactId>
+											download-maven-plugin
+										</artifactId>
+										<versionRange>
+											[1.2.1,)
+										</versionRange>
+										<goals>
+											<goal>wget</goal>
+										</goals>
+									</pluginExecutionFilter>
+									<action>
+										<execute></execute>
+									</action>
+								</pluginExecution>
+							</pluginExecutions>
+						</lifecycleMappingMetadata>
+					</configuration>
+				</plugin>
+			</plugins>
+		</pluginManagement>
+	</build>
 	<repositories>
 		<repository>
 			<id>Eclipse Paho Repo</id>
 			<url>https://repo.eclipse.org/content/repositories/paho-releases/</url>
-		</repository>
-		<repository>
-			<id>my-local-repo</id>
-			<url>file://${basedir}/lib</url>
 		</repository>
 	</repositories>
 	<dependencies>
@@ -40,11 +124,9 @@
 			<artifactId>websocket-client</artifactId>
 			<version>9.2.14.v20151106</version>
 		</dependency>
-		<dependency>
-			<groupId>io.inventit.dev</groupId>
-			<artifactId>mqtt-websocket-java</artifactId>
-			<version>1.0.1</version>
-		</dependency>
+		<!--dependency> <groupId>io.inventit.dev</groupId> 
+		<artifactId>mqtt-websocket-java</artifactId> 
+			<version>1.0.1</version> </dependency -->
 		<!-- This version is required to ensure android compatibility. -->
 		<dependency>
 			<groupId>org.json</groupId>
