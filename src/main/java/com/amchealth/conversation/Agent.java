@@ -66,7 +66,7 @@ public class Agent {
 	}
 
 	public void init(Callback<String, String> cb) {
-		socket.subscribe(agent+":state:*:"+this._id);
+		socket.subscribe(agent+"/state:*/"+this._id);
 	}
 
 	public void send(String event, JSONObject eventData,
@@ -76,7 +76,7 @@ public class Agent {
 
 	public void emit(String event, JSONObject eventData,
 			Callback<String, String> cb) {
-		String fullEvent = agent + "::" + event;
+		String fullEvent = agent + "/" + event;// single /
 
 		JSONObject data = new JSONObject();
 		jsonPut(data, "agentData", agentData);
@@ -88,14 +88,14 @@ public class Agent {
 
 	public Callback<String, String> on(String event, final Event<JSONObject> cb) {
 		return eventEmitter.on(
-				agent + ":state:" + event + ":" + jsonGet(agentData, "_id"),
+				agent + "/state/" + event + "/" + jsonGet(agentData, "_id"),
 				eventCB(cb));
 	}
 
 	public Callback<String, String> once(String event,
 			final Event<JSONObject> cb) {
 		return eventEmitter.once(
-				agent + ":state:" + event + ":" + jsonGet(agentData, "_id"),
+				agent + "/state/" + event + "/" + jsonGet(agentData, "_id"),
 				eventCB(cb));
 	}
 
