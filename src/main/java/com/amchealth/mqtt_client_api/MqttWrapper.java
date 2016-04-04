@@ -65,8 +65,8 @@ public class MqttWrapper {
 			if (sslContext != null)
 				options.setSocketFactory(sslContext.getSocketFactory());
 			options.setMqttVersion(MqttConnectOptions.MQTT_VERSION_3_1_1);
-			options.setConnectionTimeout(2);
-			options.setKeepAliveInterval(2);
+		//	options.setConnectionTimeout(2);
+		//	options.setKeepAliveInterval(2);
 
 			doConnect(emitter, options);
 
