@@ -13,6 +13,7 @@ public class Agent {
 	private Socket socket;
 	private EventEmitter<String> eventEmitter;
 	private JSONObject agentData;
+	private String _id;
 
 	static void jsonPut(JSONObject json, String key, String value) {
 		try {
@@ -54,9 +55,10 @@ public class Agent {
 
 	public Agent(String agent, Socket socket, String _id) {
 		this(agent, socket, wrapId(_id));
+		this._id=_id;
 	}
 
-	public Agent(String agent, Socket socket, JSONObject agentData) {
+	private Agent(String agent, Socket socket, JSONObject agentData) {
 		this.agent = agent;
 		this.socket = socket;
 		this.eventEmitter = socket.getConnectEmitter();
@@ -64,15 +66,7 @@ public class Agent {
 	}
 
 	public void init(Callback<String, String> cb) {
-		JSONObject msg = new JSONObject();
-		String event = agent + "::init";
-		jsonPut(msg, "event", event);
-		jsonPut(msg, "data", agentData);
-		socket.publish(event, msg.toString());
-	}
-
-	public void listenForEvent(String event) {
-		socket.subscribe(agent + "::" + event);
+		socket.subscribe(agent+":state:*:"+this._id);
 	}
 
 	public void send(String event, JSONObject eventData,
@@ -82,13 +76,9 @@ public class Agent {
 
 	public void emit(String event, JSONObject eventData,
 			Callback<String, String> cb) {
-		//JSONObject msg = new JSONObject();
 		String fullEvent = agent + "::" + event;
-		//jsonPut(msg, "event", fullEvent);
 
 		JSONObject data = new JSONObject();
-		//jsonPut(msg, "data", data);
-
 		jsonPut(data, "agentData", agentData);
 		if (eventData != null) {
 			jsonPut(data, "data", eventData);
