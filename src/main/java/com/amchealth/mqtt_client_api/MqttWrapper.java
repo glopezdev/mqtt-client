@@ -2,6 +2,8 @@ package com.amchealth.mqtt_client_api;
 
 import io.inventit.dev.mqtt.paho.MqttWebSocketAsyncClient;
 
+import java.sql.Timestamp;
+import java.util.Date;
 import java.util.LinkedHashSet;
 import java.util.Set;
 import java.util.Timer;
@@ -118,18 +120,16 @@ public class MqttWrapper {
         authFunciton.auth(new Callback<String, String>() {
             @Override
             public void call(String error, String... args) {
-                if (error != null) {
-                    System.err.println(error);
+                if (error != null || args.length<2 || args[0]==null) {
+                    System.err.println(error+" got args:"+args.length);
                     retryReconnect();
                     return;
                 }
                 final String token = args[0];
-                final String sessionId = args[1];
-
+                //final String sessionId = args[1];
                 options.setUserName("Bearer");
                 options.setPassword(token.toCharArray());
-                System.out.println("going to connect with token:" + token
-                        + " sessionId:" + sessionId);
+                System.out.println("going to connect with token:" + token);
                 doConnect(options);
             }
 
@@ -141,6 +141,7 @@ public class MqttWrapper {
         TimerTask t = new TimerTask() {
             @Override
             public void run() {
+                System.out.println(new Timestamp(new Date().getTime()) + " MqttWrapper: try reconnect");
                 doConnect(null);
             }
         };
