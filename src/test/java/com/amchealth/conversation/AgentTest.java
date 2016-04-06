@@ -1,4 +1,4 @@
-package com.scispike.conversation;
+package com.amchealth.conversation;
 
 import java.util.UUID;
 import java.util.concurrent.CountDownLatch;
@@ -68,7 +68,7 @@ public class AgentTest {
               put("data", new JSONObject());
             }
           };
-          agent.send("signal", o, new Callback<String, String>() {
+          agent.emit("signal", o, new Callback<String, String>() {
             
             @Override
             public void call(String error, String... args) {
@@ -88,8 +88,6 @@ public class AgentTest {
       }
     });
     socket.connect();
-    //socket.subscribe("test.obj:state:running:"+agentId);
-    //socket.subscribe("test.obj:state:null:"+agentId);
     try {
       signal.await(2, TimeUnit.SECONDS);// wait for connect
       Assert.assertEquals("should have gotten to running",0, signal.getCount());

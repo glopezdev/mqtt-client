@@ -69,11 +69,6 @@ public class Agent {
 		socket.subscribe(agent+"/state/*/"+this._id);
 	}
 
-	public void send(String event, JSONObject eventData,
-			Callback<String, String> cb) {
-		emit(event, eventData, cb);
-	}
-
 	public void emit(String event, JSONObject eventData,
 			Callback<String, String> cb) {
 		String fullEvent = agent + "/" + event;
