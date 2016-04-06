@@ -66,7 +66,10 @@ public class Agent {
 	}
 
 	public void init(Callback<String, String> cb) {
-		socket.subscribe(agent+"/state/*/"+this._id);
+	  listen("+");
+	}
+	public void listen(String event){
+	  socket.subscribe(agent+"/state/"+event+"/"+this._id);
 	}
 
 	public void emit(String event, JSONObject eventData,
