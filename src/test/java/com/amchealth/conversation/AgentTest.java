@@ -54,7 +54,7 @@ public class AgentTest {
             signal.countDown();
           }
         });
-        agent.init(null);
+        agent.init();
       }
     });
     agent.once("null",new Event<JSONObject>() {
@@ -81,13 +81,7 @@ public class AgentTest {
         
       }
     });
-    connectEmitter.on("socket::connected",new Event<String>() {
-      @Override
-      public void onEmit(String... data) {
-        agent.init(null);
-      }
-    });
-    socket.connect();
+    //agent.init();
     try {
       signal.await(2, TimeUnit.SECONDS);// wait for connect
       Assert.assertEquals("should have gotten to running",0, signal.getCount());

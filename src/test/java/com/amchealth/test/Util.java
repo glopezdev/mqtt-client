@@ -1,12 +1,6 @@
 package com.amchealth.test;
 
-import java.net.URLDecoder;
 import java.util.concurrent.atomic.AtomicInteger;
-
-import org.apache.commons.httpclient.Header;
-import org.apache.commons.httpclient.HttpClient;
-import org.apache.commons.httpclient.HttpMethod;
-import org.apache.commons.httpclient.methods.GetMethod;
 
 import com.amchealth.callback.Callback;
 import com.amchealth.mqtt_client_api.AuthFunction;
@@ -31,27 +25,7 @@ public class Util {
 
 			@Override
 			public void auth(Callback<String, String> cb) {
-				HttpClient client = new HttpClient();
-				HttpMethod m = new GetMethod(HTTP);
-				if (failures.getAndDecrement() > 0) {
-					System.out.println("failing: " + failures.get());
-					cb.call("bad");
-					return;
-				}
-				try {
-					client.executeMethod(m);
-					Header c = m.getResponseHeader("set-cookie");
-					String v = c.getValue();
-					String[] split = v.split(";");
-					String sessionId = URLDecoder.decode(
-							split[0].split("=")[1], "UTF-8").replaceAll(
-							"s:([^\\.]*).*", "$1");
-					;
-					cb.call(null, "token", sessionId);
-				} catch (Exception e) {
-					e.printStackTrace();
-					cb.call(e.toString());
-				}
+					cb.call(null, "token", "whocares");
 			}
 		};
 	}

@@ -22,23 +22,17 @@ public class Socket {
 
 	public Socket(String baseURL,final AuthFunction authFunciton, SSLContext sslContext) {
 		this.baseURL = baseURL;
-		this.socketClient = getMQTTClient();
-		this.socketClient.setSSLContext(sslContext);
-		this.socketClient.setAuthFunction(authFunciton);
-		this.emitter = new EventEmitter<String>();
-	}
-
-	private synchronized MqttWrapper getMQTTClient() {
-		MqttWrapper socket = globalSockets.get(baseURL);
-		if (socket == null) {
-			socket = new MqttWrapper(baseURL);
-			globalSockets.put(baseURL, socket);
+		socketClient = globalSockets.get(baseURL);
+		emitter = new EventEmitter<String>();
+		if (socketClient == null) {
+		  socketClient = new MqttWrapper(baseURL,sslContext,authFunciton,emitter);
+		  globalSockets.put(baseURL, socketClient);
 		}
-		return socket;
+		socketClient.connect(emitter);
 	}
 
+	@Deprecated
 	public void connect() {
-		socketClient.connect(emitter);
 	}
 
 	public boolean isConnected() {
@@ -55,9 +49,12 @@ public class Socket {
 		return emitter;
 	}
 
+	synchronized
 	public void disconnect() {
 		if (socketClient!=null){
-			socketClient.disconnect(emitter);
+			if(socketClient.disconnect(emitter)){
+			  globalSockets.remove(baseURL);
+			};
 			socketClient = null;
 		}
 	}

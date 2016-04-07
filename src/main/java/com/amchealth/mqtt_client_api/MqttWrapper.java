@@ -37,13 +37,13 @@ public class MqttWrapper {
 
     private AuthFunction authFunciton;
 
-    private boolean isConnecting = false;
-
     private int backoff = MIN_BACKOFF;
 
     final Timer timer = new Timer(true);
 
-    MqttWrapper(String baseURL) {
+    MqttWrapper(String baseURL, SSLContext sslContext, AuthFunction authFunciton,EventEmitter<String> emitter) {
+      this.sslContext = sslContext;
+      this.authFunciton = authFunciton;
         try {
             socketClient = new MqttWebSocketAsyncClient(baseURL,
                     MqttWebSocketAsyncClient.generateClientId(),
@@ -65,28 +65,23 @@ public class MqttWrapper {
             }
 
             public void connectionLost(Throwable arg0) {
-                arg0.printStackTrace();
-                System.out.println("On connection lost " + arg0.getMessage());
-                isConnecting = false;
-                connect(null);
+//                arg0.printStackTrace();
+//                System.out.println("On connection lost " + arg0.getMessage());
+//                isConnecting = false;
+//                connect(null);
             }
         });
+        connect(emitter);
+        doConnect(null);
     }
 
     public void connect(EventEmitter<String> emitter) {
+      if(emitter!=null){
         eventEmitters.add(emitter);
-        if (!isConnecting) {
-            backoff = MIN_BACKOFF;
-            doConnect(null);
-        } else if (isConnected()) {
-            emitter.emit("socket::connected");
-        } else {
-            System.err.println("UNDEFINED CONNECT STATE");
-        }
+      }
     }
 
     private void doConnect(MqttConnectOptions options) {
-        isConnecting = true;
 
         if (options == null)
             options = buildOptions();
@@ -95,16 +90,18 @@ public class MqttWrapper {
             IMqttToken token = socketClient.connect(options);
             token.waitForCompletion();
             emit("socket::connected");
-        } catch (MqttSecurityException e) {
-            if (e.getReasonCode() != 5)
-                throw new RuntimeException(e);
-            reconnect(options);
         } catch (MqttException e) {
-            if (e.getReasonCode() == 6)// connection refuse
-                reconnect(options);
-            else if (e.getReasonCode() != 32100)// already connected
-                throw new RuntimeException(e);
+            if (e.getReasonCode() == MqttSecurityException.REASON_CODE_NOT_AUTHORIZED){
+              reconnect(options);
+            }
+//            throw new RuntimeException(e);
         }
+//        catch (MqttException e) {
+//            if (e.getReasonCode() == MqttSecurityException.REASON_CODE_UNEXPECTED_ERROR)// connection refuse
+//                reconnect(options);
+//            else if (e.getReasonCode() != 32100)// already connected
+//                throw new RuntimeException(e);
+//        }
     }
 
     private MqttConnectOptions buildOptions() {
@@ -122,27 +119,25 @@ public class MqttWrapper {
             public void call(String error, String... args) {
                 if (error != null || args.length<2 || args[0]==null) {
                     System.err.println(error+" got args:"+args.length);
-                    retryReconnect();
-                    return;
+                    final String token = args[0];
+                    //final String sessionId = args[1];
+                    options.setUserName("Bearer");
+                    options.setPassword(token.toCharArray());
+                    System.out.println("going to connect with token:" + token);
                 }
-                final String token = args[0];
-                //final String sessionId = args[1];
-                options.setUserName("Bearer");
-                options.setPassword(token.toCharArray());
-                System.out.println("going to connect with token:" + token);
-                doConnect(options);
+                retryReconnect(options);
             }
 
         });
     }
 
-    private void retryReconnect() {
+    private void retryReconnect(final MqttConnectOptions options) {
         backoff = Math.min(MAX_BACKOFF, backoff * 2);
         TimerTask t = new TimerTask() {
             @Override
             public void run() {
                 System.out.println(new Timestamp(new Date().getTime()) + " MqttWrapper: try reconnect");
-                doConnect(null);
+                doConnect(options);
             }
         };
         timer.schedule(t, backoff);
@@ -162,9 +157,6 @@ public class MqttWrapper {
     }
 
     public void publish(String topic, MqttMessage message) {
-        if (!isConnected()) {
-            connect(null);
-        }
         try {
             socketClient.publish(topic, message);
         } catch (MqttPersistenceException e) {
@@ -176,22 +168,21 @@ public class MqttWrapper {
         }
     }
 
-    public void disconnect(EventEmitter<String> eventEmitter) {
+    public boolean disconnect(EventEmitter<String> eventEmitter) {
         eventEmitters.remove(eventEmitter);
         if (eventEmitters.size() == 0) {
             try {
                 IMqttToken token = socketClient.disconnect();
                 token.waitForCompletion();
                 backoff = MIN_BACKOFF;
-                isConnecting = false;
             } catch (MqttException e) {
-                if (e.getReasonCode() != 32102)// already disconnected
+                if (e.getReasonCode() != MqttException.REASON_CODE_CLIENT_ALREADY_DISCONNECTED || e.getReasonCode()  != MqttException.REASON_CODE_CLIENT_DISCONNECTING)// already disconnected
                     e.printStackTrace();
             }
         }
         eventEmitter.emit("socket::disconnected");
         eventEmitter.removeAllListeners();
-
+        return eventEmitters.size() == 0;
     }
 
     private void emit(String message, String... data) {

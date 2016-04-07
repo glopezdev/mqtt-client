@@ -36,25 +36,21 @@ public class SocketTest {
         }
     }
 
-    @Test
-    public void shouldBeDisconnectedAfterCreated() {
-        assertTrue(socket != null);
-        assertFalse(socket.isConnected());
-    }
 
     @Test
     public void shouldBeAbleToConnect() {
         final CountDownLatch signal = new CountDownLatch(1);
 
         EventEmitter<String> connectEmitter = socket.getConnectEmitter();
+        if (socket.isConnected()) {
+          signal.countDown();
+        }
         connectEmitter.on("socket::connected", new Event<String>() {
             @Override
             public void onEmit(String... data) {
                 signal.countDown();
             }
         });
-
-        socket.connect();
 
         try {
             signal.await(2, UNIT);
@@ -71,14 +67,15 @@ public class SocketTest {
         Socket reconnectiongSocket = Util.getSocket(new AtomicInteger(5));
         EventEmitter<String> connectEmitter = reconnectiongSocket
                 .getConnectEmitter();
+        if (socket.isConnected()) {
+          signal.countDown();
+        }
         connectEmitter.on("socket::connected", new Event<String>() {
             @Override
             public void onEmit(String... data) {
                 signal.countDown();
             }
         });
-
-        reconnectiongSocket.connect();
 
         try {
             signal.await(5, UNIT);
@@ -96,6 +93,9 @@ public class SocketTest {
         final CountDownLatch signal = new CountDownLatch(1);
 
         EventEmitter<String> connectEmitter = socket.getConnectEmitter();
+        if (socket.isConnected()) {
+          signal.countDown();
+        }
         connectEmitter.on("socket::connected", new Event<String>() {
             @Override
             public void onEmit(String... data) {
@@ -103,10 +103,8 @@ public class SocketTest {
             }
         });
 
-        socket.connect();
         socket.disconnect();
         Socket socket2 = Util.getSocket();
-        socket2.connect();
 
         try {
             signal.await(2, UNIT);
@@ -123,6 +121,9 @@ public class SocketTest {
         final CountDownLatch signal = new CountDownLatch(2);
 
         EventEmitter<String> connectEmitter = socket.getConnectEmitter();
+        if(socket.isConnected()){
+          signal.countDown();
+        }
         connectEmitter.on("socket::connected", new Event<String>() {
             @Override
             public void onEmit(String... data) {
@@ -136,7 +137,6 @@ public class SocketTest {
             }
         });
 
-        socket.connect();
         socket.disconnect();
 
         try {
@@ -177,9 +177,12 @@ public class SocketTest {
     @Test
     @Ignore
     public void shouldBeAbleToStayConnectedFor15sec() {
-        final CountDownLatch signal = new CountDownLatch(2);
+        final CountDownLatch signal = new CountDownLatch(1);
 
         EventEmitter<String> connectEmitter = socket.getConnectEmitter();
+        if(socket.isConnected()){
+          signal.countDown();
+        }
         connectEmitter.on("socket::connected", new Event<String>() {
             @Override
             public void onEmit(String... data) {
@@ -187,12 +190,11 @@ public class SocketTest {
             }
         });
 
-        socket.connect();
-        for (int i = 0; i < 10; i++) {
+        for (int i = 0; i < 15; i++) {
             System.out.println("subscribing " + i);
-            socket.subscribe("agent::event" + i);
+            socket.publish("test.obj/init","{\"_id\":"+i+"}");
             try {
-                Thread.sleep(10000);
+                Thread.sleep(1000);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
@@ -201,7 +203,7 @@ public class SocketTest {
         try {
             signal.await(2, UNIT);
             assertTrue(socket.isConnected());
-            assertEquals(1, signal.getCount());
+            assertEquals(0, signal.getCount());
         } catch (InterruptedException e) {
             Assert.fail(e.getMessage());
         }
@@ -251,13 +253,15 @@ public class SocketTest {
                 disconnectState2.countDown();
             }
         };
+        if (socket.isConnected()) {
+          cb.onEmit();
+          cb.onEmit();
+        }
         connectEmitter1.once("socket::connected", cb);
         connectEmitter2.once("socket::connected", cb);
         connectEmitter1.once("socket::disconnected", dcb1);
         connectEmitter2.once("socket::disconnected", dcb2);
 
-        socket.connect();
-        socket2.connect();
         connectState.await(5, UNIT);
         assertEquals(0, connectState.getCount());
         assertEquals(2, socketClient.eventEmitters.size());
