@@ -8,7 +8,7 @@ import com.amchealth.mqtt_client_api.Socket;
 
 public class Util {
 
-	public static final String URL = "ws://localhost:3000/mqtt";
+	public static final String URL = "tcp://localhost:3000";
 	public static final String HTTP = "http://localhost:3000";
 
 	public static Socket getSocket() {
