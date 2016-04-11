@@ -21,6 +21,7 @@ import com.amchealth.test.Util;
 public class SocketTest {
 
     private static final TimeUnit UNIT = TimeUnit.SECONDS;
+    Long time = System.currentTimeMillis()*10000;
     private Socket socket;
 
     @Before
@@ -191,8 +192,14 @@ public class SocketTest {
         });
 
         for (int i = 0; i < 15; i++) {
-            System.out.println("subscribing " + i);
-            socket.publish("test.obj/init","{\"_id\":"+i+"}");
+            System.out.println("subscribing " + (time+i));
+            try {
+              socket.subscribe("test.obj/state/+/"+(time+i));
+              socket.publish("test.obj/signal","{\"agentData\":{\"_id\":\""+(time+i)+"\"},\"data\":{}}");
+            } catch (Exception e) {
+              System.out.println("FAILED BUT THAT Is OK ********************************************************");
+              e.printStackTrace();
+            }
             try {
                 Thread.sleep(1000);
             } catch (InterruptedException e) {
